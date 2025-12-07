@@ -60,6 +60,8 @@ public class EC5Util
                 }
             }
 
+            // BEGIN Android-removed: Unsupported curves
+            /*
             ECCurve c_25519 = CustomNamedCurves.getByNameLazy("Curve25519").getCurve();
 
             map.put(new ECCurve.Fp(
@@ -69,6 +71,8 @@ public class EC5Util
                 c_25519.getOrder(),
                 c_25519.getCofactor(),
                 true), c_25519);
+            */
+            // END Android-removed: Unsupported curves
 
             return map;
         }
@@ -283,7 +287,7 @@ public class EC5Util
     }
 
     public static EllipticCurve convertCurve(
-        ECCurve curve, 
+        ECCurve curve,
         byte[]  seed)
     {
         ECField field = convertField(curve.getField());

@@ -1203,7 +1203,11 @@ public class PKCS12KeyStoreSpi
         //
         // set the attributes on the key
         //
-        PKCS12BagAttributeCarrier bagAttr = (PKCS12BagAttributeCarrier)privKey;
+        // Android-changed: allow null bagAttr, as upstream does.
+        PKCS12BagAttributeCarrier bagAttr = null;
+        if (privKey instanceof PKCS12BagAttributeCarrier) {
+            bagAttr = (PKCS12BagAttributeCarrier) privKey; // This cast is now safe
+        }
         String alias = null;
         ASN1OctetString localId = null;
 
@@ -1219,19 +1223,16 @@ public class PKCS12KeyStoreSpi
             {
                 attr = (ASN1Primitive)attrSet.getObjectAt(0);
 
-                ASN1Encodable existing = bagAttr.getBagAttribute(aOid);
-                if (existing != null)
-                {
-                    // OK, but the value has to be the same
-                    if (!existing.toASN1Primitive().equals(attr))
-                    {
-                        throw new IOException(
-                            "attempt to add existing attribute with different value");
+                if (bagAttr != null) {
+                    ASN1Encodable existing = bagAttr.getBagAttribute(aOid);
+                    if (existing != null) {
+                        if (!existing.toASN1Primitive().equals(attr)) {
+                            throw new IOException(
+                                    "attempt to add existing attribute with different value");
+                        }
+                    } else {
+                        bagAttr.setBagAttribute(aOid, attr);
                     }
-                }
-                else
-                {
-                    bagAttr.setBagAttribute(aOid, attr);
                 }
 
                 if (aOid.equals(pkcs_9_at_friendlyName))
