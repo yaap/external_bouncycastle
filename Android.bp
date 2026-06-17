@@ -87,10 +87,7 @@ java_library {
     name: "bouncycastle",
     // Restrict visibility to only those targets that need to access it.
     visibility: [
-        "//art/build/apex",
-        "//art/build/sdk",
-        "//art/tools/ahat",
-        "//art/tools/fuzzer",
+        "//art:__subpackages__",
         "//libcore:__subpackages__",
         "//packages/modules/ArtPrebuilt",
     ],
@@ -111,7 +108,6 @@ java_library {
         shrink: true,
         optimize: false,
         obfuscate: false,
-        proguard_compatibility: false,
         ignore_warnings: false,
         proguard_flags_files: ["proguard.flags"],
     },
@@ -172,6 +168,7 @@ unbundled_visibility = [
     "//external/android-key-attestation",
     "//external/conscrypt",
     "//external/okhttp",
+    "//external/keyattestation",
     "//external/robolectric-shadows",
     "//external/robolectric-shadows/robolectric",
     "//external/robolectric-shadows/shadows/supportv4",
@@ -346,6 +343,37 @@ java_library {
     ],
     apex_available: [
         "com.android.uwb",
+    ],
+    srcs: [
+        "bcprov/src/main/java/org/bouncycastle/**/*.java",
+        "bcpkix/src/main/java/org/bouncycastle/cert/**/*.java",
+        "bcpkix/src/main/java/org/bouncycastle/cms/**/*.java",
+        "bcpkix/src/main/java/org/bouncycastle/operator/**/*.java",
+    ],
+
+    exclude_srcs: [
+        "bcprov/src/main/java/org/bouncycastle/iana/**/*.java",
+        "bcprov/src/main/java/org/bouncycastle/its/**/*.java",
+    ],
+    sdk_version: "core_current",
+    lint: {
+        warning_checks: ["SuspiciousIndentation"],
+    },
+}
+
+// Bouncycastle for use by packages/modules/WebApp and LSKF Recovery project .
+//
+// Excludes directories not needed.
+java_library {
+    name: "bouncycastle-webapp",
+    defaults: ["bouncycastle-errorprone-defaults"],
+    visibility: [
+        "//frameworks/base/services/lskfreset",
+        "//frameworks/base/services/tests/lskfreset",
+        "//packages/modules/WebApp/service",
+    ],
+    apex_available: [
+        "com.android.webapp",
     ],
     srcs: [
         "bcprov/src/main/java/org/bouncycastle/**/*.java",
